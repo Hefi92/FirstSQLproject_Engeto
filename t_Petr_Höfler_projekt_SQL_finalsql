@@ -1,3 +1,7 @@
+/*
+ * První WITH generuje časově proměnné - první část CASE WHEN generuje "0" pro pracovní dny a "1" pro víkend.
+ * Druhá část CASE WHEN na základě definice jednotlivých měsíců generuje roční období -> 3-5 jaro, 6-8 léto, 9-11 podzim a zbytek zima.
+ */
 WITH period_of_year AS(
 	SELECT
 	date,
@@ -11,6 +15,10 @@ WITH period_of_year AS(
 	ELSE 3 END time_of_year
 	FROM covid19_basic_differences
 ),
+/*
+ * Druhé WITH generuje podíly jednotlivých náboženství v konkrétních zemích. Každý řádek bere v potaz konkrétní náboženství.
+ * Populace pro konkrétní náboženství se dělí celkovou populací země z tabulky economies. Tabulky jsou následně spojené pomocí "join".
+ */
 religion AS(
  	SELECT
  	rel.country,
@@ -27,6 +35,9 @@ religion AS(
  	ON eco.country = rel.country AND CAST(eco.year-1 AS INT) = CAST(rel.year AS INT)
  	GROUP BY rel.country
  ),
+ /*
+  * Další WITH generuje očekávanou dobu dožití jedntlivých zemí pro rok 2015.
+  */
   expectancy_2015 AS (
 	SELECT
 	country,
@@ -34,6 +45,9 @@ religion AS(
 	FROM life_expectancy
 	WHERE `year` = '2015'
 ),
+/*
+ * Další WITH generuje očekávanou dobu dožití jedntlivých zemí pro rok 1965.
+ */
 	expectancy_1965 AS (
 	SELECT
 	country,
@@ -41,6 +55,10 @@ religion AS(
 	FROM life_expectancy
 	WHERE `year` = '1965'
 ),
+/*
+ * Následné WITH generuje průměrnou denní teplotu v jednotlivých městech. Teplota se generuje od 6:00 do 21?00 hod.
+ * Zaokrouhleno na 2 des. místa, teplota převedena na datový typ FLOAT. Následně je ve finální části syntaxe napojeno přes capital_city s tabulkou countries.
+ */
 	Daily_temperature AS (
 	SELECT
 	date,
@@ -50,6 +68,11 @@ religion AS(
 	WHERE `time` BETWEEN '06:00' AND '21:00' AND city IS NOT NULL
 	GROUP BY date, city
 ),
+/*
+ * Toto WITH generuje počet hodin v daném dni, kdyby byly srážky nenulové.
+ * Prvně je spočítané čas pomocí COUNT a vynásobeno třemi, kvůli tříhodinovým intervalům v tabulce weather.
+ * Následně zaokrouhleno na 2 des. míta, údaj "mm" vymazán a hodnota převedena na FLOAT s podmínkou větší než nula.
+ */
 	Non_zero_humidity AS(
 	SELECT
 	date,
@@ -61,6 +84,11 @@ religion AS(
 	GROUP BY date,city
 	ORDER BY date DESC
 ),
+/*
+ * Poslední napojení přes WITH generuje maximální sílu větru v nárazech během dne.
+ * Využito funkce MAX, kdy síla větru (gust) převedeno na datový typ FLOAT, zaokrouhleno na 2 des. místa.
+ * Časově omezeno opět mezi 6:00 a 21:00 hod.
+ */
 	Maximum_gust_per_day AS (
 	SELECT
 	date,
@@ -70,6 +98,13 @@ religion AS(
 	WHERE time BETWEEN '06:00' AND '21:00' AND city IS NOT NULL
 	GROUP BY date, city
 )	
+/*
+ * Následuje vygenerování jednotlivých požadovaných sloupců, které jsou součástí jedné tabulky.
+ * Panelová data "date" a "country", po kterých následují požadované a seřazené jednotlivé sloupce. 
+ * Některé z nich(např. "gini", "mortality_under5" atd.) bráno již z existujících tabulek a pouze připojeno - nebylo třeba počítat.
+ * Jako základní tabulka brána "countries", na které jsou následně pomocí "join" napojeny ostatní pomocné tabulky.
+ * Omezující podmínky WHERE doplněny na posledním řádku skriptu.
+ */
 	SELECT
 	poy.date,
 	poy.country,
@@ -79,6 +114,7 @@ religion AS(
 	ROUND(eco.GDP/eco.population * 100, 2) GDP_per_citizen,
 	eco.gini,
 	eco.mortaliy_under5,
+	cou.median_age_2018,
 	rel.*,
 	ROUND(life_exp_2015.life_expectancy - life_exp_1965.life_expectancy, 2) Life_expectancy_diff_2015_1965,
 	temp.Average_daily_temperature,
