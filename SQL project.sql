@@ -101,4 +101,4 @@ religion AS(
 	ON cou.capital_city = non.city
 	JOIN Maximum_gust_per_day gust
 	ON cou.capital_city = gust.city
-	WHERE 1=1 AND eco.GDP IS NOT NULL AND eco.gini IS NOT NULL AND eco.population IS NOT NULL;
+	WHERE eco.GDP IS NOT NULL AND eco.gini IS NOT NULL AND eco.population IS NOT NULL;
