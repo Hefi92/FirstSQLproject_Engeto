@@ -23,46 +23,46 @@ religion AS(
  	MAX(CASE religion WHEN 'Other Religions' THEN ROUND(rel.population / eco.population * 100,2) END) Other_rel,
  	MAX(CASE religion WHEN 'Judaism' THEN ROUND(rel.population / eco.population * 100,2) END) Judaism_rel
  	FROM religions rel
- 	JOIN economies eco 
+ 	JOIN economies eco
  	ON eco.country = rel.country AND CAST(eco.year-1 AS INT) = CAST(rel.year AS INT)
  	GROUP BY rel.country
  ),
   expectancy_2015 AS (
-	SELECT 
+	SELECT
 	country,
 	life_expectancy
-	FROM life_expectancy 
+	FROM life_expectancy
 	WHERE `year` = '2015'
 ),
 	expectancy_1965 AS (
-	SELECT 
+	SELECT
 	country,
 	life_expectancy
 	FROM life_expectancy
 	WHERE `year` = '1965'
 ),
 	Daily_temperature AS (
-	SELECT 
+	SELECT
 	date,
 	city,
 	ROUND(CAST(AVG(temp) AS FLOAT), 2) Average_daily_temperature
-	FROM weather w 
-	WHERE `time` BETWEEN '06:00' AND '21:00' AND city IS NOT NULL 
+	FROM weather w
+	WHERE `time` BETWEEN '06:00' AND '21:00' AND city IS NOT NULL
 	GROUP BY date, city
 ),
 	Non_zero_humidity AS(
-	SELECT 
+	SELECT
 	date,
 	city,
 	COUNT(time) * 3 AS Hour_amount_of_humidity_more_than_zero,
 	ROUND(CAST((REPLACE(rain,'mm','')) AS FLOAT), 2) AS Humidity_more_than_zero
-	FROM weather 
+	FROM weather
 	WHERE ROUND(CAST((REPLACE(rain,'mm','')) AS FLOAT), 2) > 0
 	GROUP BY date,city
-	ORDER BY date DESC 
+	ORDER BY date DESC
 ),
-	Maximum_gust_per_day AS ( 
-	SELECT 
+	Maximum_gust_per_day AS (
+	SELECT
 	date,
 	city,
 	ROUND(CAST(MAX(gust) AS FLOAT), 2) Maximum_gust_during_day
