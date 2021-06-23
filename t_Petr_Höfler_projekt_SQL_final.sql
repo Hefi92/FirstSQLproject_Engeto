@@ -1,6 +1,6 @@
 /*
- * PrvnÌ WITH generuje casove promennÈ - prvnÌ c·st CASE WHEN generuje "0" pro pracovnÌ dny a "1" pro vÌkend.
- * Druh· c·st CASE WHEN na z·klade definice jednotliv˝ch mesÌcu generuje rocnÌ obdobÌ -> 3-5 jaro, 6-8 lÈto, 9-11 podzim a zbytek zima.
+ * Prvn√≠ WITH generuje casove promenn√© - prvn√≠ c√°st CASE WHEN generuje "0" pro pracovn√≠ dny a "1" pro v√≠kend.
+ * Druh√° c√°st CASE WHEN na z√°klade definice jednotliv√Ωch mes√≠cu generuje rocn√≠ obdob√≠ -> 3-5 jaro, 6-8 l√©to, 9-11 podzim a zbytek zima.
  */
 WITH period_of_year AS(
 	SELECT
@@ -16,27 +16,27 @@ WITH period_of_year AS(
 	FROM covid19_basic_differences
 ),
 /*
- * DruhÈ WITH generuje podÌly jednotliv˝ch n·boûenstvÌ v konkrÈtnÌch zemÌch. Kaûd˝ r·dek bere v potaz konkrÈtnÌ n·boûenstvÌ.
- * Populace pro konkrÈtnÌ n·boûenstvÌ se delÌ celkovou populacÌ zeme z tabulky economies. Tabulky jsou n·sledne spojenÈ pomocÌ "join".
+ * Druh√© WITH generuje pod√≠ly jednotliv√Ωch n√°bo≈æenstv√≠ v konkr√©tn√≠ch zem√≠ch. Ka≈æd√Ω r√°dek bere v potaz konkr√©tn√≠ n√°bo≈æenstv√≠.
+ * Populace pro konkr√©tn√≠ n√°bo≈æenstv√≠ se del√≠ celkovou populac√≠ zeme z tabulky economies. Tabulky jsou n√°sledne spojen√© pomoc√≠ "join".
  */
 religion AS(
  	SELECT
  	rel.country,
- 	MAX(CASE religion WHEN 'Islam' THEN ROUND(rel.population / eco.population * 100,2) END) Islam_rel,
- 	MAX(CASE religion WHEN 'Christianity' THEN ROUND(rel.population / eco.population * 100,2) END) Christianity_rel,
- 	MAX(CASE religion WHEN 'Unaffiliated Religions' THEN ROUND(rel.population / eco.population * 100,2) END) Unaffiliated_rel,
- 	MAX(CASE religion WHEN 'Hinduism' THEN ROUND(rel.population / eco.population * 100,2) END) Hinduism_rel,
- 	MAX(CASE religion WHEN 'Buddhism' THEN ROUND(rel.population / eco.population * 100,2) END) Buddhism_rel,
- 	MAX(CASE religion WHEN 'Folk Religions' THEN ROUND(rel.population / eco.population * 100,2) END) Folk_rel,
- 	MAX(CASE religion WHEN 'Other Religions' THEN ROUND(rel.population / eco.population * 100,2) END) Other_rel,
- 	MAX(CASE religion WHEN 'Judaism' THEN ROUND(rel.population / eco.population * 100,2) END) Judaism_rel
+MAX(CASE religion WHEN 'Islam' THEN ROUND(rel.population / eco.population * 100,2) END) Islam_rel,
+MAX(CASE religion WHEN 'Christianity' THEN ROUND(rel.population / eco.population * 100,2) END) Christianity_rel,
+MAX(CASE religion WHEN 'Unaffiliated Religions' THEN ROUND(rel.population / eco.population * 100,2) END) Unaffiliated_rel,
+MAX(CASE religion WHEN 'Hinduism' THEN ROUND(rel.population / eco.population * 100,2) END) Hinduism_rel,
+MAX(CASE religion WHEN 'Buddhism' THEN ROUND(rel.population / eco.population * 100,2) END) Buddhism_rel,
+MAX(CASE religion WHEN 'Folk Religions' THEN ROUND(rel.population / eco.population * 100,2) END) Folk_rel,
+MAX(CASE religion WHEN 'Other Religions' THEN ROUND(rel.population / eco.population * 100,2) END) Other_rel,
+MAX(CASE religion WHEN 'Judaism' THEN ROUND(rel.population / eco.population * 100,2) END) Judaism_rel
  	FROM religions rel
  	JOIN economies eco
  	ON eco.country = rel.country AND CAST(eco.year-1 AS INT) = CAST(rel.year AS INT)
  	GROUP BY rel.country
  ),
  /*
-  * DalöÌ WITH generuje ocek·vanou dobu doûitÌ jedntliv˝ch zemÌ pro rok 2015.
+  * Dal≈°√≠ WITH generuje ocek√°vanou dobu do≈æit√≠ jedntliv√Ωch zem√≠ pro rok 2015.
   */
   expectancy_2015 AS (
 	SELECT
@@ -46,7 +46,7 @@ religion AS(
 	WHERE `year` = '2015'
 ),
 /*
- * DalöÌ WITH generuje ocek·vanou dobu doûitÌ jedntliv˝ch zemÌ pro rok 1965.
+ * Dal≈°√≠ WITH generuje ocek√°vanou dobu do≈æit√≠ jedntliv√Ωch zem√≠ pro rok 1965.
  */
 	expectancy_1965 AS (
 	SELECT
@@ -56,8 +56,8 @@ religion AS(
 	WHERE `year` = '1965'
 ),
 /*
- * N·slednÈ WITH generuje pr˘mernou dennÌ teplotu v jednotliv˝ch mestech. Teplota se generuje od 6:00 do 21:00 hod.
- * Zaokrouhleno na 2 des. mÌsta, teplota p¯evedena na datov˝ typ FLOAT. N·sledne je ve fin·lnÌ c·sti syntaxe napojeno pres capital_city s tabulkou countries.
+ * N√°sledn√© WITH generuje pr√πmernou denn√≠ teplotu v jednotliv√Ωch mestech. Teplota se generuje od 6:00 do 21:00 hod.
+ * Zaokrouhleno na 2 des. m√≠sta, teplota p√∏evedena na datov√Ω typ FLOAT. N√°sledne je ve fin√°ln√≠ c√°sti syntaxe napojeno pres capital_city s tabulkou countries.
  */
 	Daily_temperature AS (
 	SELECT
@@ -69,9 +69,9 @@ religion AS(
 	GROUP BY date, city
 ),
 /*
- * Toto WITH generuje pocet hodin v danÈm dni, kdyby byly sr·ûky nenulovÈ.
- * Prvne je spocÌtan˝ cas pomocÌ COUNT a vyn·sobeno tremi, kv˘li trÌhodinov˝m interval˘m v tabulce weather.
- * N·sledne zaokrouhleno na 2 des. mÌta, ˙daj "mm" vymaz·n a hodnota p¯evedena na FLOAT s podmÌnkou vÏtöÌ neû nula.
+ * Toto WITH generuje pocet hodin v dan√©m dni, kdyby byly sr√°≈æky nenulov√©.
+ * Prvne je spoc√≠tan√Ω cas pomoc√≠ COUNT a vyn√°sobeno tremi, kv√πli tr√≠hodinov√Ωm interval√πm v tabulce weather.
+ * N√°sledne zaokrouhleno na 2 des. m√≠ta, √∫daj "mm" vymaz√°n a hodnota p√∏evedena na FLOAT s podm√≠nkou v√¨t≈°√≠ ne≈æ nula.
  */
 	Non_zero_humidity AS(
 	SELECT
@@ -85,8 +85,8 @@ religion AS(
 	ORDER BY date DESC
 ),
 /*
- * PoslednÌ napojenÌ pres WITH generuje maxim·lnÌ sÌlu vetru v n·razech behem dne.
- * Vyuûito funkce MAX, kdy sÌla vÏtru (gust) prevedeno na datov˝ typ FLOAT, zaokrouhleno na 2 des. mÌsta.
+ * Posledn√≠ napojen√≠ pres WITH generuje maxim√°ln√≠ s√≠lu vetru v n√°razech behem dne.
+ * Vyu≈æito funkce MAX, kdy s√≠la v√¨tru (gust) prevedeno na datov√Ω typ FLOAT, zaokrouhleno na 2 des. m√≠sta.
  * Casove omezeno opet mezi 6:00 a 21:00 hod.
  */
 	Maximum_gust_per_day AS (
@@ -99,11 +99,11 @@ religion AS(
 	GROUP BY date, city
 )	
 /*
- * N·sleduje vygenerov·nÌ jednotliv˝ch poûadovan˝ch sloupc˘, kterÈ jsou souc·stÌ jednÈ tabulky.
- * Panelov· data "date" a "country", po kter˝ch n·sledujÌ poûadovanÈ a serazenÈ jednotlivÈ sloupce. 
- * NekterÈ z nich(nap¯. "gini", "mortality_under5" atd.) br·no z jiû existujÌcÌch tabulek a pouze pripojeno - nebylo treba pocÌtat.
- * Jako z·kladnÌ tabulka br·na "countries", na kterÈ jsou n·sledne pomocÌ "join" napojeny ostatnÌ pomocnÈ tabulky.
- * OmezujÌcÌ podmÌnky WHERE doplneny na poslednÌm r·dku skriptu.
+ * N√°sleduje vygenerov√°n√≠ jednotliv√Ωch po≈æadovan√Ωch sloupc√π, kter√© jsou souc√°st√≠ jedn√© tabulky.
+ * Panelov√° data "date" a "country", po kter√Ωch n√°sleduj√≠ po≈æadovan√© a serazen√© jednotliv√© sloupce. 
+ * Nekter√© z nich(nap√∏. "gini", "mortality_under5" atd.) br√°no z ji≈æ existuj√≠c√≠ch tabulek a pouze pripojeno - nebylo treba poc√≠tat.
+ * Jako z√°kladn√≠ tabulka br√°na "countries", na kter√© jsou n√°sledne pomoc√≠ "join" napojeny ostatn√≠ pomocn√© tabulky.
+ * Omezuj√≠c√≠ podm√≠nky WHERE doplneny na posledn√≠m r√°dku skriptu.
  */
 	SELECT
 	poy.date,
