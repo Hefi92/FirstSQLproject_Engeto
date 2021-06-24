@@ -10,8 +10,8 @@ WITH period_of_year AS(
 	CASE	WHEN WEEKDAY(date) IN (0, 1, 2, 3, 4) THEN 0
 	ELSE 1 END AS weekday_or_weekend,
 	CASE	WHEN MONTH(date) BETWEEN 3 AND 5 THEN 0
-			WHEN MONTH(date) BETWEEN 6 AND 8 THEN 1
-			WHEN MONTH(date) BETWEEN 9 AND 11 THEN 2
+		WHEN MONTH(date) BETWEEN 6 AND 8 THEN 1
+		WHEN MONTH(date) BETWEEN 9 AND 11 THEN 2
 	ELSE 3 END time_of_year
 	FROM covid19_basic_differences
 ),
